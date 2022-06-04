@@ -59,6 +59,8 @@ def curses_main(screen: curses._CursesWindow, args: argparse.Namespace):
             curses.update_lines_cols()
             x = min(curses.COLS - text_len, x)
             y = min(curses.LINES - 1, y)
+        elif ch != -1 and args.screensaver:
+            run = False
         elif ch in [81, 113]:  # q, Q
             run = False
         elif 48 <= ch <= 57:  # 0 to 9
@@ -87,6 +89,8 @@ def argument_parser(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     parser.add_argument("-s", "--speed", type=positive_int_zero_to_nine,
                         default=DEFAULT_SPEED,
                         help="Set speed. 0-Fast, 5-Default, 9-Slow")
+    parser.add_argument("--screensaver", action="store_true",
+                        help="Screensaver mode. Any key will exit")
     return parser.parse_args(argv)
 
 

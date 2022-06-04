@@ -30,6 +30,14 @@ def test_argument_parser_set_speed_error(test_arguments):
         bouncing_text.argument_parser(test_arguments)
 
 
+@pytest.mark.parametrize("arguments, expected_result", [
+    ([], False), (["--screensaver"], True)
+])
+def test_argument_parser_screensaver(arguments, expected_result):
+    result = bouncing_text.argument_parser(arguments)
+    assert result.screensaver == expected_result
+
+
 @pytest.mark.parametrize("test_values, expected_results", [
     ("0", 0), ("1", 1), ("2", 2), ("3", 3), ("4", 4),
     ("5", 5), ("6", 6), ("7", 7), ("8", 8), ("9", 9)

@@ -1,9 +1,13 @@
 from __future__ import annotations
 # bouncing text
 
+import argparse
 import curses
 import random
 import time
+
+from typing import Optional
+from typing import Sequence
 
 
 DEFAULT_TEXT = "Text Here"
@@ -14,13 +18,13 @@ def color():
     curses.init_pair(2, random.randrange(0, curses.COLORS), CURSES_BLACK)
 
 
-def curses_main(screen: curses._CursesWindow):
+def curses_main(screen: curses._CursesWindow, args: argparse.Namespace):
     curses.curs_set(0)  # Set the cursor to off.
     screen.timeout(0)  # Turn blocking off for screen.getch().
     curses.use_default_colors()
     color()
     screen.bkgd(" ", curses.color_pair(2))
-    text = DEFAULT_TEXT
+    text = args.text
     x = y = 0
     dx = dy = 1
     text_len = len(text)
@@ -57,8 +61,16 @@ def curses_main(screen: curses._CursesWindow):
         time.sleep(0.08)
 
 
+def argument_parser(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("text", default=DEFAULT_TEXT, nargs="?",
+                        help="Custom text")
+    return parser.parse_args(argv)
+
+
 def main():
-    curses.wrapper(curses_main)
+    args = argument_parser()
+    curses.wrapper(curses_main, args)
 
 
 if __name__ == "__main__":

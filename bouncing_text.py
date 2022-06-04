@@ -12,6 +12,8 @@ from typing import Sequence
 
 DEFAULT_TEXT = "Text Here"
 CURSES_BLACK = 16
+SPEED_LIST = [0.01, 0.02, 0.025, 0.03, 0.04, 0.05, 0.06, 0.08, 0.1, 0.3]
+DEFAULT_SPEED = 5
 
 
 def color():
@@ -25,6 +27,7 @@ def curses_main(screen: curses._CursesWindow, args: argparse.Namespace):
     color()
     screen.bkgd(" ", curses.color_pair(2))
     text = args.text
+    speed = args.speed
     x = y = 0
     dx = dy = 1
     text_len = len(text)
@@ -58,13 +61,32 @@ def curses_main(screen: curses._CursesWindow, args: argparse.Namespace):
             y = min(curses.LINES - 1, y)
         elif ch in [81, 113]:  # q, Q
             run = False
-        time.sleep(0.08)
+        elif 48 <= ch <= 57:  # 0 to 9
+            speed = int(chr(ch))
+        time.sleep(SPEED_LIST[speed])
+
+
+def positive_int_zero_to_nine(value: str) -> int:
+    """
+    Used with argparse. Checks to see if value is positive int between 0 and 10.
+    """
+    msg = f"{value} is an invalid positive int value 0 to 9"
+    try:
+        int_value = int(value)
+        if int_value < 0 or int_value >= 10:
+            raise argparse.ArgumentTypeError(msg)
+        return int_value
+    except ValueError:
+        raise argparse.ArgumentTypeError(msg)
 
 
 def argument_parser(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("text", default=DEFAULT_TEXT, nargs="?",
                         help="Custom text")
+    parser.add_argument("-s", "--speed", type=positive_int_zero_to_nine,
+                        default=DEFAULT_SPEED,
+                        help="Set speed. 0-Fast, 5-Default, 9-Slow")
     return parser.parse_args(argv)
 
 
